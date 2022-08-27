@@ -1,4 +1,4 @@
-name: Black Linter
+name: Black
 
 on: [push, pull_request]
 
