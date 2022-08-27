@@ -10,7 +10,7 @@ class RebalanceLoss(Function):
 
     @staticmethod
     def backward(ctx, grad_output):
-        weights, = ctx.saved_tensors
+        (weights,) = ctx.saved_tensors
 
         # reweigh gradient pixelwise so that rare colors get a chance to
         # contribute

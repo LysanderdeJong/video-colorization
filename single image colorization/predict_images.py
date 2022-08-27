@@ -24,9 +24,12 @@ def predict_images(self, cuda_device=0):
         with torch.no_grad():
             for img_dir in tqdm(range(len(datasets))):
                 for img_index in tqdm(range(len(os.listdir(datasets[img_dir])))):
-                    img_path = os.path.join(datasets[img_dir], os.listdir(os.path.join(datasets[img_dir]))[img_index])
+                    img_path = os.path.join(
+                        datasets[img_dir],
+                        os.listdir(os.path.join(datasets[img_dir]))[img_index],
+                    )
 
-                    img = (cv2.imread(img_path) / 255.).astype(np.float32)
+                    img = (cv2.imread(img_path) / 255.0).astype(np.float32)
                     img = cv2.resize(img, (256, 256), interpolation=cv2.INTER_AREA)
                     img = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
 
@@ -38,15 +41,21 @@ def predict_images(self, cuda_device=0):
 
                     img_l = torch.cat([img_l_t, img_l_t, img_l_t], dim=0)
 
-                    norm = transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                               std=[0.229, 0.224, 0.225])
+                    norm = transforms.Normalize(
+                        mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
+                    )
                     img_l = norm(img_l)
 
                     img_l = torch.unsqueeze(img_l, 0).cuda()
                     output = self.forward(img_l)
 
                     ab = self.decode_q(output)
-                    ab = F.interpolate(ab, size=(img_l.shape[-2], img_l.shape[-1]), mode="bilinear", align_corners=False)
+                    ab = F.interpolate(
+                        ab,
+                        size=(img_l.shape[-2], img_l.shape[-1]),
+                        mode="bilinear",
+                        align_corners=False,
+                    )
 
                     img_l_t = img_l_t * 100
                     img_l_t = torch.unsqueeze(img_l_t, 0)
@@ -60,5 +69,9 @@ def predict_images(self, cuda_device=0):
                     rgb = cv2.cvtColor(lab, cv2.COLOR_LAB2RGB)
                     rgb = (rgb * 255).astype(np.uint8)
 
-                    save_path = os.path.join(save_root, saves[img_dir], os.listdir(os.path.join(datasets[img_dir]))[img_index])
+                    save_path = os.path.join(
+                        save_root,
+                        saves[img_dir],
+                        os.listdir(os.path.join(datasets[img_dir]))[img_index],
+                    )
                     io.imsave(save_path, rgb, quality=90)

@@ -4,7 +4,7 @@ import torch
 
 
 class SoftEncodeAB:
-    def __init__(self, cielab, neighbours=5, sigma=5.0, device='cuda'):
+    def __init__(self, cielab, neighbours=5, sigma=5.0, device="cuda"):
         self.cielab = cielab
         self.q_to_ab = torch.from_numpy(self.cielab.q_to_ab).to(device)
 
@@ -22,14 +22,15 @@ class SoftEncodeAB:
 
         cdist = torch.cdist(q_to_ab, ab_.t())
 
-        nns = cdist.argsort(dim=0)[:self.neighbours, :]
+        nns = cdist.argsort(dim=0)[: self.neighbours, :]
 
         # gaussian weighting
         nn_gauss = ab.new_zeros(self.neighbours, m)
 
         for i in range(self.neighbours):
             nn_gauss[i, :] = self._gauss_eval(
-                q_to_ab[nns[i, :], :].t(), ab_, self.sigma)
+                q_to_ab[nns[i, :], :].t(), ab_, self.sigma
+            )
 
         nn_gauss /= nn_gauss.sum(dim=0, keepdim=True)
 
@@ -46,4 +47,4 @@ class SoftEncodeAB:
     def _gauss_eval(x, mu, sigma):
         norm = 1 / (2 * math.pi * sigma)
 
-        return norm * torch.exp(-torch.sum((x - mu)**2, dim=0) / (2 * sigma**2))
+        return norm * torch.exp(-torch.sum((x - mu) ** 2, dim=0) / (2 * sigma**2))

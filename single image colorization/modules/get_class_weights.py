@@ -2,7 +2,7 @@ import torch
 
 
 class GetClassWeights:
-    def __init__(self, cielab, lambda_=0.5, device='cuda'):
+    def __init__(self, cielab, lambda_=0.5, device="cuda"):
         prior = torch.from_numpy(cielab.gamut.prior).to(device)
 
         uniform = torch.zeros_like(prior)
