@@ -39,11 +39,11 @@ class ImageDataset(Dataset):
         img_big = resize(img, size=(224, 224))
         img_small = resize(img, size=(56, 56))
 
-        img_big = (np.array(img_big) / 255.).astype(np.float32)
-        img_small = (np.array(img_small) / 255.).astype(np.float32)
+        img_big = (np.array(img_big) / 255.0).astype(np.float32)
+        img_small = (np.array(img_small) / 255.0).astype(np.float32)
 
         img_lab = cv2.cvtColor(img_big, cv2.COLOR_RGB2LAB)
-        img_l = img_lab[:, :, 0] / 100.
+        img_l = img_lab[:, :, 0] / 100.0
         img_ab = cv2.cvtColor(img_small, cv2.COLOR_RGB2LAB)[:, :, 1:]
 
         img_ab = torch.from_numpy(img_ab).float().permute(2, 0, 1)
@@ -52,33 +52,37 @@ class ImageDataset(Dataset):
 
         img_l = torch.cat([img_l, img_l, img_l], dim=0)
 
-        norm = transform.Normalize(mean=[0.485, 0.456, 0.406],
-                                   std=[0.229, 0.224, 0.225])
+        norm = transform.Normalize(
+            mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
+        )
         img_l = norm(img_l)
-        #img_l *= 100
-        #img_l = img_l - 50
+        # img_l *= 100
+        # img_l = img_l - 50
 
         return (img_l, img_ab)
 
 
 def img_aug(img, p=1.0, size=(224, 224)):
-    pipeline = A.Compose([
-        A.HorizontalFlip(p=0.5),
-        A.ShiftScaleRotate(p=0.5),
-        A.RandomSizedCrop(min_max_height=(160, 256), height=size[0], width=size[1], p=1.0)
-    ], p=p)
+    pipeline = A.Compose(
+        [
+            A.HorizontalFlip(p=0.5),
+            A.ShiftScaleRotate(p=0.5),
+            A.RandomSizedCrop(
+                min_max_height=(160, 256), height=size[0], width=size[1], p=1.0
+            ),
+        ],
+        p=p,
+    )
 
     augmented = pipeline(image=img)
-    return augmented['image']
+    return augmented["image"]
 
 
 def resize(img, size=(224, 224)):
-    pipeline = A.Compose([
-        A.Resize(size[0], size[1])
-    ], p=1.0)
+    pipeline = A.Compose([A.Resize(size[0], size[1])], p=1.0)
 
     resized = pipeline(image=img)
-    return resized['image']
+    return resized["image"]
 
 
 class Imagenet_Subset(Dataset):
@@ -113,11 +117,11 @@ class Imagenet_Subset(Dataset):
         img_big = resize(img, size=(224, 224))
         img_small = resize(img, size=(56, 56))
 
-        img_big = (np.array(img_big) / 255.).astype(np.float32)
-        img_small = (np.array(img_small) / 255.).astype(np.float32)
+        img_big = (np.array(img_big) / 255.0).astype(np.float32)
+        img_small = (np.array(img_small) / 255.0).astype(np.float32)
 
         img_lab = cv2.cvtColor(img_big, cv2.COLOR_RGB2LAB)
-        img_l = img_lab[:, :, 0] / 100.
+        img_l = img_lab[:, :, 0] / 100.0
         img_ab = cv2.cvtColor(img_small, cv2.COLOR_RGB2LAB)[:, :, 1:]
 
         img_ab = torch.from_numpy(img_ab).float().permute(2, 0, 1)
@@ -126,10 +130,11 @@ class Imagenet_Subset(Dataset):
 
         img_l = torch.cat([img_l, img_l, img_l], dim=0)
 
-        norm = transform.Normalize(mean=[0.485, 0.456, 0.406],
-                                   std=[0.229, 0.224, 0.225])
+        norm = transform.Normalize(
+            mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
+        )
         img_l = norm(img_l)
-        #img_l *= 100
-        #img_l = img_l - 50
+        # img_l *= 100
+        # img_l = img_l - 50
 
         return (img_l, img_ab)

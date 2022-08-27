@@ -2,7 +2,7 @@ import torch
 
 
 class AnnealedMeanDecodeQ:
-    def __init__(self, cielab, T, device='cuda'):
+    def __init__(self, cielab, T, device="cuda"):
         self.q_to_ab = torch.from_numpy(cielab.q_to_ab).to(device)
 
         self.T = T
@@ -28,13 +28,14 @@ class AnnealedMeanDecodeQ:
     def _unbin(self, q):
         _, _, h, w = q.shape
 
-        ab = torch.stack([
-            self.q_to_ab.index_select(
-                0, q_.flatten()
-            ).reshape(h, w, 2).permute(2, 0, 1)
-
-            for q_ in q
-        ])
+        ab = torch.stack(
+            [
+                self.q_to_ab.index_select(0, q_.flatten())
+                .reshape(h, w, 2)
+                .permute(2, 0, 1)
+                for q_ in q
+            ]
+        )
 
         return ab
 

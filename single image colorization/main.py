@@ -9,18 +9,20 @@ def main(hparams):
     pl.seed_everything(42)
     checkpoint_callback = ModelCheckpoint(save_top_k=-1)
 
-    wandb_logger = WandbLogger(project='video-colorization', tags=["colornet"],
-                               name='SLURM', log_model=True)
+    wandb_logger = WandbLogger(
+        project="video-colorization", tags=["colornet"], name="SLURM", log_model=True
+    )
     hparams.logger = wandb_logger
     lr_logger = LearningRateLogger()
 
     colornet = model.ColorNet(hparams)
-    trainer = pl.Trainer.from_argparse_args(hparams, checkpoint_callback=checkpoint_callback,
-                                            callbacks=[lr_logger])
+    trainer = pl.Trainer.from_argparse_args(
+        hparams, checkpoint_callback=checkpoint_callback, callbacks=[lr_logger]
+    )
     trainer.fit(colornet)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = ArgumentParser()
 
     parser = model.ColorNet.add_model_specific_args(parser)

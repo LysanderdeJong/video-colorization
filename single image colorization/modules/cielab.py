@@ -38,8 +38,7 @@ class CIELAB:
 
         a, b, self.ab = self._get_ab()
 
-        self.ab_gamut_mask = self._get_ab_gamut_mask(
-            a, b, self.ab, self.gamut)
+        self.ab_gamut_mask = self._get_ab_gamut_mask(a, b, self.ab, self.gamut)
 
         self.ab_to_q = self._get_ab_to_q(self.ab_gamut_mask)
 
@@ -84,12 +83,12 @@ class CIELAB:
         if ax is None:
             _, ax = plt.subplots()
 
-        imshow = partial(ax.imshow,
-                         np.flip(mat, axis=0),
-                         extent=[*cls.AB_RANGE[:2]] * 2)
+        imshow = partial(
+            ax.imshow, np.flip(mat, axis=0), extent=[*cls.AB_RANGE[:2]] * 2
+        )
 
         if len(mat.shape) < 3 or mat.shape[2] == 1:
-            im = imshow(cmap='jet')
+            im = imshow(cmap="jet")
 
             fig = plt.gcf()
             fig.colorbar(im, cax=fig.add_axes())
@@ -112,16 +111,15 @@ class CIELAB:
 
             ax.set_xticks(
                 np.linspace(tick_min_minor, tick_max_minor, mat.shape[1] + 1),
-                minor=True)
+                minor=True,
+            )
 
             ax.set_yticks(
                 np.linspace(tick_min_minor, tick_max_minor, mat.shape[0] + 1),
-                minor=True)
+                minor=True,
+            )
 
-            ax.grid(which='minor',
-                    color='w',
-                    linestyle='-',
-                    linewidth=2)
+            ax.grid(which="minor", color="w", linestyle="-", linewidth=2)
 
         # major ticks
         tick_min_major = tick_min_minor + cls.AB_BINSIZE // 2
@@ -132,17 +130,14 @@ class CIELAB:
 
         # some of this will be obscured by the minor ticks due to a five year
         # old matplotlib bug...
-        ax.grid(which='major',
-                color='k',
-                linestyle=':',
-                dashes=(1, 4))
+        ax.grid(which="major", color="k", linestyle=":", dashes=(1, 4))
 
         # tick marks
         for ax_ in ax.xaxis, ax.yaxis:
-            ax_.set_ticks_position('both')
+            ax_.set_ticks_position("both")
 
-        ax.tick_params(axis='both', which='major', direction='in')
-        ax.tick_params(axis='both', which='minor', length=0)
+        ax.tick_params(axis="both", which="major", direction="in")
+        ax.tick_params(axis="both", which="minor", length=0)
 
         # limits
         lim_min = tick_min_major - cls.AB_BINSIZE
@@ -169,16 +164,20 @@ class CIELAB:
         color_space_lab = np.dstack((l_, self.ab))
 
         # convert to RGB
-        color_space_rgb = (255 * np.clip(color.lab2rgb(color_space_lab), 0, 1)).astype(np.uint8)
+        color_space_rgb = (255 * np.clip(color.lab2rgb(color_space_lab), 0, 1)).astype(
+            np.uint8
+        )
 
         # mask out of gamut colors
         color_space_rgb[~self.ab_gamut_mask, :] = 255
 
         # display color space
-        self._plot_ab_matrix(color_space_rgb,
-                             pixel_borders=True,
-                             ax=ax,
-                             title=r"$RGB(a, b \mid L = {})$".format(l))
+        self._plot_ab_matrix(
+            color_space_rgb,
+            pixel_borders=True,
+            ax=ax,
+            title=r"$RGB(a, b \mid L = {})$".format(l),
+        )
 
     def plot_empirical_distribution(self, dataset, ax=None, verbose=False):
         # accumulate ab values
@@ -190,9 +189,11 @@ class CIELAB:
             if verbose:
                 fmt = "\rprocessing image {}/{}"
 
-                print(fmt.format(i + 1, len(dataset)),
-                      end=('\n' if i == len(dataset) - 1 else ''),
-                      flush=True)
+                print(
+                    fmt.format(i + 1, len(dataset)),
+                    end=("\n" if i == len(dataset) - 1 else ""),
+                    flush=True,
+                )
 
             img = np.moveaxis(img, 0, -1)
             ab_rounded = np.round(img[:, :, 1:].reshape(-1, 2)).astype(int)
